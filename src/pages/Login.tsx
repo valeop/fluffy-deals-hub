@@ -65,7 +65,7 @@ const Login = () => {
   return (
     <Layout>
       <div className="container mx-auto px-6 py-16">
-        <div className="max-w-md ml-auto mr-16">
+        <div className="max-w-md mx-auto">
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl text-center text-primary">

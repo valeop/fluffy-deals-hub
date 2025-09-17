@@ -41,9 +41,11 @@ export const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon">
-          <ShoppingCart size={20} />
-        </Button>
+        <Link to="/admin/promotions">
+          <Button variant="ghost" size="icon">
+            <ShoppingCart size={20} />
+          </Button>
+        </Link>
         
         {user ? (
           <div className="flex items-center gap-2">
