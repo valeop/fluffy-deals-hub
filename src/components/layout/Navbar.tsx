@@ -10,7 +10,7 @@ export const Navbar = () => {
   const { user, logout } = useAuth();
 
   const navItems = [
-    { name: 'Productos', path: '/products' },
+    { name: 'Productos', path: '/admin/promotions' },
     { name: 'Promociones', path: '/admin/promotions' }
   ];
 

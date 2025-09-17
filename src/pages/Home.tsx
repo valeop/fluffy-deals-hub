@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Layout } from '@/components/layout/Layout';
 import heroPets from '@/assets/hero-pets.jpg';
@@ -24,9 +25,11 @@ const Home = () => {
               Todo lo que tu mascota necesita en un solo lugar
             </p>
             
-            <Button variant="hero" size="lg">
-              Comprar
-            </Button>
+            <Link to="/admin/promotions">
+              <Button variant="hero" size="lg">
+                Comprar
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
