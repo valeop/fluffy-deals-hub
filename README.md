@@ -2,7 +2,12 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/a6dc8357-b963-42db-a2d3-197376ce8b20
+**Vercel URL (monitorized by Git Actions)**: https://fluffy-deals-hub.vercel.app/
+
+**Lovable URL**: https://lovable.dev/projects/a6dc8357-b963-42db-a2d3-197376ce8b20
+
+## Workflow Status
+[![deployment in Vercel](https://github.com/valeop/fluffy-deals-hub/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/valeop/fluffy-deals-hub/actions/workflows/ci-cd.yml)
 
 ## How can I edit this code?
 
