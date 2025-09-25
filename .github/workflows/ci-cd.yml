@@ -29,7 +29,7 @@ jobs:
             - name: Install Dependencies
               run: npm ci --no-audit
             
-            - name: Lint Analysis CI
+            - name: Lint Analysis
               run: echo "Should run npm run lint"
         
     build:
@@ -107,7 +107,7 @@ jobs:
     deploy:
         needs: [test, e2e]
         runs-on: ubuntu-22.04
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'patomomo-dev/fluffy-deals-hub'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v5
