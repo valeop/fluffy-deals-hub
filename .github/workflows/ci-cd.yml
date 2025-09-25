@@ -1,0 +1,63 @@
+name: deployment in Vercel
+
+on: 
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    testing:
+        name: Testing and Linting
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v5
+
+            - name: Install Node.js
+              uses: actions/setup-node@v5
+              with:
+                node-version: '22'
+                cache: 'npm'
+            
+            - name: Install Dependencies
+              run: npm install --no-audit --no-fund
+            
+            - name: Lint Analysis CI
+              run: echo "Should run npm run lint"
+
+            - name: Run Tests
+              run: echo "No tests to run yet"
+
+            - name: Run E2E Tests
+              run: echo "No E2E tests to run yet"           
+
+    deploy:
+        name: Deploy to Vercel
+        runs-on: ubuntu-latest
+        needs: testing
+        if: github.ref == 'refs/heads/main'
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v5
+              
+            - name: Install Node.js
+              uses: actions/setup-node@v5
+              with:
+                node-version: '22'
+
+            - name: Install Dependencies
+              run: npm install --no-audit --no-fund
+
+            - name: Build Project
+              run: npm run build
+
+            - name: Deploy to Vercel
+              uses: nexterias/actions-vercel@v1
+              with:
+                token: ${{ secrets.VERCEL_TOKEN }}
+                org-id: ${{ secrets.VERCEL_ORG_ID }}
+                project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+                production: ${{ github.ref == 'refs/heads/main' }}
+                prebuilt: true
+            
