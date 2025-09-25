@@ -107,7 +107,7 @@ jobs:
     deploy:
         needs: [test, e2e]
         runs-on: ubuntu-22.04
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'patomomo-dev/fluffy-deals-hub'
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v5
