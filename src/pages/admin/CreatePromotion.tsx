@@ -31,7 +31,6 @@ const CreatePromotion = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<string>('');
   const [formData, setFormData] = useState<Partial<PromotionForm>>({});
   const { addPromotion } = usePromotions();
   const { toast } = useToast();
@@ -101,10 +100,10 @@ const CreatePromotion = () => {
       return;
     }
 
-    if (selectedProduct === '') {
+    if (selectedProducts.length === 0) {
       toast({
         title: "Error",
-        description: "Debe seleccionar un producto",
+        description: "Debe seleccionar al menos un producto",
         variant: "destructive",
       });
       return;
@@ -148,7 +147,11 @@ const CreatePromotion = () => {
   };
 
   const toggleProductSelection = (productId: string) => {
-    setSelectedProduct(productId === selectedProduct ? '' : productId);
+    setSelectedProducts(prev => 
+      prev.includes(productId) 
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
   };
 
   const renderStep1 = () => (
@@ -301,7 +304,7 @@ const CreatePromotion = () => {
               <Card 
                 key={product.id} 
                 className={`p-4 cursor-pointer transition-colors ${
-                  selectedProduct === product.id 
+                  selectedProducts.includes(product.id) 
                     ? 'bg-accent border-primary' 
                     : 'hover:bg-accent/50'
                 }`}
@@ -310,7 +313,7 @@ const CreatePromotion = () => {
                 <div className="flex items-center gap-3">
                   <div onClick={(e) => e.stopPropagation()}>
                     <Checkbox
-                      checked={selectedProduct === product.id}
+                      checked={selectedProducts.includes(product.id)}
                       onCheckedChange={() => toggleProductSelection(product.id)}
                       className="h-5 w-5"
                     />
@@ -325,9 +328,9 @@ const CreatePromotion = () => {
             ))}
           </div>
           
-          {selectedProduct === '' && (
+          {selectedProducts.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">
-              Selecciona un producto para continuar
+              Selecciona al menos un producto para continuar
             </p>
           )}
         </div>
@@ -344,7 +347,7 @@ const CreatePromotion = () => {
           <Button 
             type="submit" 
             className="flex-1"
-            disabled={loading || selectedProduct === ''}
+            disabled={loading || selectedProducts.length === 0}
           >
             {loading ? 'Guardando...' : 'Guardar'}
           </Button>
