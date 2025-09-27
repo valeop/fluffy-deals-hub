@@ -10,8 +10,8 @@ export const Navbar = () => {
   const { user, logout } = useAuth();
 
   const navItems = [
-    { name: 'Productos', path: '/admin/promotions' },
-    { name: 'Promociones', path: '/admin/promotions' }
+    { name: 'Productos', path: '/admin/promotions', key: 'productos' },
+    { name: 'Promociones', path: '/admin/promotions', key: 'promociones' }
   ];
 
   return (
@@ -25,7 +25,7 @@ export const Navbar = () => {
         <nav className="flex items-center gap-6">
           {navItems.map((item) => (
             <Link
-              key={item.path}
+              key={item.key}
               to={item.path}
               className={cn(
                 "text-sm font-medium transition-colors hover:text-primary",

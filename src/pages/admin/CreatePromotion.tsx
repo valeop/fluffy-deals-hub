@@ -308,11 +308,13 @@ const CreatePromotion = () => {
                 onClick={() => toggleProductSelection(product.id)}
               >
                 <div className="flex items-center gap-3">
-                  <Checkbox
-                    checked={selectedProduct === product.id}
-                    onCheckedChange={() => toggleProductSelection(product.id)}
-                    className="h-5 w-5"
-                  />
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={selectedProduct === product.id}
+                      onCheckedChange={() => toggleProductSelection(product.id)}
+                      className="h-5 w-5"
+                    />
+                  </div>
                   <Package size={20} className="text-muted-foreground" />
                   <div className="flex-1">
                     <h4 className="font-medium">{product.name}</h4>
