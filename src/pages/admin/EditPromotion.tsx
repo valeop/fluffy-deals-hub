@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -26,15 +26,52 @@ const promotionSchema = z.object({
 
 type PromotionForm = z.infer<typeof promotionSchema>;
 
-const CreatePromotion = () => {
+const categories = [
+  { value: 'alimento', label: 'Alimento' },
+  { value: 'juguetes', label: 'Juguetes' },
+  { value: 'cuidado', label: 'Cuidado e Higiene' },
+  { value: 'accesorios', label: 'Accesorios' },
+];
+
+const productsByCategory: Record<string, Array<{id: string, name: string, price: number}>> = {
+  alimento: [
+    { id: '1', name: 'Alimento Premium para Perros', price: 45.99 },
+    { id: '2', name: 'Alimento para Gatos Adultos', price: 32.50 },
+    { id: '3', name: 'Snacks Naturales', price: 15.75 },
+    { id: '4', name: 'Alimento para Cachorros', price: 38.90 },
+  ],
+  juguetes: [
+    { id: '5', name: 'Pelota de Goma', price: 12.99 },
+    { id: '6', name: 'Rascador para Gatos', price: 89.99 },
+    { id: '7', name: 'Cuerda para Perros', price: 18.50 },
+    { id: '8', name: 'Ratón de Peluche', price: 8.75 },
+  ],
+  cuidado: [
+    { id: '9', name: 'Champú para Mascotas', price: 24.99 },
+    { id: '10', name: 'Cepillo Dental', price: 16.50 },
+    { id: '11', name: 'Toallitas Húmedas', price: 12.25 },
+    { id: '12', name: 'Cortaúñas Profesional', price: 35.00 },
+  ],
+  accesorios: [
+    { id: '13', name: 'Collar Ajustable', price: 22.99 },
+    { id: '14', name: 'Correa Retráctil', price: 45.50 },
+    { id: '15', name: 'Cama Acolchada', price: 75.00 },
+    { id: '16', name: 'Bebedero Automático', price: 89.99 },
+  ],
+};
+
+const EditPromotion = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { promotions, updatePromotion } = usePromotions();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [formData, setFormData] = useState<Partial<PromotionForm>>({});
-  const { addPromotion } = usePromotions();
-  const { toast } = useToast();
-  const navigate = useNavigate();
+
+  const promotion = promotions.find(p => p.id === id);
 
   const {
     register,
@@ -47,39 +84,24 @@ const CreatePromotion = () => {
     resolver: zodResolver(promotionSchema),
   });
 
-  const categories = [
-    { value: 'alimento', label: 'Alimento' },
-    { value: 'juguetes', label: 'Juguetes' },
-    { value: 'cuidado', label: 'Cuidado e Higiene' },
-    { value: 'accesorios', label: 'Accesorios' },
-  ];
-
-  const productsByCategory: Record<string, Array<{id: string, name: string, price: number}>> = {
-    alimento: [
-      { id: '1', name: 'Alimento Premium para Perros', price: 45.99 },
-      { id: '2', name: 'Alimento para Gatos Adultos', price: 32.50 },
-      { id: '3', name: 'Snacks Naturales', price: 15.75 },
-      { id: '4', name: 'Alimento para Cachorros', price: 38.90 },
-    ],
-    juguetes: [
-      { id: '5', name: 'Pelota de Goma', price: 12.99 },
-      { id: '6', name: 'Rascador para Gatos', price: 89.99 },
-      { id: '7', name: 'Cuerda para Perros', price: 18.50 },
-      { id: '8', name: 'Ratón de Peluche', price: 8.75 },
-    ],
-    cuidado: [
-      { id: '9', name: 'Champú para Mascotas', price: 24.99 },
-      { id: '10', name: 'Cepillo Dental', price: 16.50 },
-      { id: '11', name: 'Toallitas Húmedas', price: 12.25 },
-      { id: '12', name: 'Cortaúñas Profesional', price: 35.00 },
-    ],
-    accesorios: [
-      { id: '13', name: 'Collar Ajustable', price: 22.99 },
-      { id: '14', name: 'Correa Retráctil', price: 45.50 },
-      { id: '15', name: 'Cama Acolchada', price: 75.00 },
-      { id: '16', name: 'Bebedero Automático', price: 89.99 },
-    ],
-  };
+  useEffect(() => {
+    if (promotion) {
+      setValue('name', promotion.name);
+      setValue('description', promotion.description);
+      setValue('category', promotion.category);
+      setValue('discount', promotion.discount);
+      setValue('startDate', promotion.startDate);
+      setValue('endDate', promotion.endDate);
+      setSelectedCategory(promotion.category);
+      setSelectedProducts(promotion.selectedProducts || []);
+    } else if (id) {
+      toast({
+        title: "Promoción no encontrada",
+        variant: "destructive",
+      });
+      navigate('/admin/promotions');
+    }
+  }, [promotion, id, navigate, setValue, toast]);
 
   const handleNextStep = async () => {
     const isValid = await trigger(['name', 'description', 'category', 'discount', 'startDate', 'endDate']);
@@ -119,28 +141,29 @@ const CreatePromotion = () => {
         'accesorios': 'cat-products',
       };
 
-      addPromotion({
-        name: formData.name || data.name,
-        description: formData.description || data.description,
-        category: formData.category || data.category,
-        discount: formData.discount || data.discount,
-        startDate: formData.startDate || data.startDate,
-        endDate: formData.endDate || data.endDate,
-        image: imageMap[formData.category || data.category] || 'dog-products',
-        isActive: true,
-        selectedProducts: selectedProducts,
-      });
+      if (id) {
+        updatePromotion(id, {
+          name: formData.name || data.name,
+          description: formData.description || data.description,
+          category: formData.category || data.category,
+          discount: formData.discount || data.discount,
+          startDate: formData.startDate || data.startDate,
+          endDate: formData.endDate || data.endDate,
+          image: imageMap[formData.category || data.category] || 'dog-products',
+          selectedProducts: selectedProducts,
+        });
 
-      toast({
-        title: "Promoción creada",
-        description: "La promoción se ha creado exitosamente",
-      });
-      
-      navigate('/admin/promotions');
+        toast({
+          title: "Promoción actualizada",
+          description: "La promoción se ha actualizado exitosamente",
+        });
+        
+        navigate('/admin/promotions');
+      }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Ocurrió un error al crear la promoción",
+        description: "Ocurrió un error al actualizar la promoción",
         variant: "destructive",
       });
     } finally {
@@ -162,7 +185,6 @@ const CreatePromotion = () => {
         <Label htmlFor="name">Nombre de la promoción</Label>
         <Input
           id="name"
-          defaultValue={formData.name}
           {...register('name')}
           className={errors.name ? 'border-destructive' : ''}
         />
@@ -177,7 +199,6 @@ const CreatePromotion = () => {
           <Input
             id="startDate"
             type="date"
-            defaultValue={formData.startDate}
             {...register('startDate')}
             className={errors.startDate ? 'border-destructive' : ''}
           />
@@ -191,7 +212,6 @@ const CreatePromotion = () => {
           <Input
             id="endDate"
             type="date"
-            defaultValue={formData.endDate}
             {...register('endDate')}
             className={errors.endDate ? 'border-destructive' : ''}
           />
@@ -206,7 +226,6 @@ const CreatePromotion = () => {
         <Textarea
           id="description"
           rows={4}
-          defaultValue={formData.description}
           {...register('description')}
           className={errors.description ? 'border-destructive' : ''}
         />
@@ -219,7 +238,7 @@ const CreatePromotion = () => {
         <div className="space-y-2">
           <Label>Categoría</Label>
           <Select
-            value={selectedCategory || formData.category}
+            value={selectedCategory}
             onValueChange={(value) => {
               setSelectedCategory(value);
               setValue('category', value);
@@ -248,7 +267,6 @@ const CreatePromotion = () => {
             type="number"
             min="1"
             max="100"
-            defaultValue={formData.discount}
             {...register('discount')}
             className={errors.discount ? 'border-destructive' : ''}
           />
@@ -278,7 +296,7 @@ const CreatePromotion = () => {
   );
 
   const renderStep2 = () => {
-    const categoryProducts = productsByCategory[formData.category || selectedCategory] || [];
+    const categoryProducts = productsByCategory[selectedCategory] || [];
     
     return (
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -296,7 +314,7 @@ const CreatePromotion = () => {
             <div>
               <h3 className="text-lg font-semibold text-primary">Seleccionar Productos</h3>
               <p className="text-sm text-muted-foreground">
-                Categoría: {categories.find(c => c.value === (formData.category || selectedCategory))?.label}
+                Categoría: {categories.find(c => c.value === selectedCategory)?.label}
               </p>
             </div>
           </div>
@@ -358,13 +376,17 @@ const CreatePromotion = () => {
     );
   };
 
+  if (!promotion) {
+    return null;
+  }
+
   return (
     <Layout>
       <div className="container mx-auto px-6 py-8">
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
             <CardTitle className="text-2xl text-primary">
-              Crear Nueva Promoción - Paso {currentStep} de 2
+              Editar Promoción - Paso {currentStep} de 2
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -376,4 +398,4 @@ const CreatePromotion = () => {
   );
 };
 
-export default CreatePromotion;
+export default EditPromotion;

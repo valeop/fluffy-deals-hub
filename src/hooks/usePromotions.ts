@@ -1,57 +1,64 @@
 import { useState, useEffect } from 'react';
 import { Promotion } from '@/types';
+import { localStorageService } from '@/services/localStorage.service';
 
 export const usePromotions = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem('petstore:promotions');
-    if (stored) {
-      setPromotions(JSON.parse(stored));
-    } else {
-      // Initialize with sample data
-      const samplePromotions: Promotion[] = [
-        {
-          id: '1',
-          name: 'Descuento Alimento Premium',
-          description: 'Obtén 20% de descuento en alimentos premium para perros y gatos',
-          category: 'Alimento',
-          discount: 20,
-          startDate: '2024-01-15',
-          endDate: '2024-02-15',
-          image: 'dog-products'
-        },
-        {
-          id: '2',
-          name: 'Juguetes para Gatos',
-          description: 'Compra 2 y llévate 1 gratis en toda la línea de juguetes para gatos',
-          category: 'Juguetes',
-          discount: 33,
-          startDate: '2024-01-10',
-          endDate: '2024-01-31',
-          image: 'cat-products'
-        }
-      ];
-      setPromotions(samplePromotions);
-      localStorage.setItem('petstore:promotions', JSON.stringify(samplePromotions));
-    }
+    localStorageService.initializeDefaults();
+    const stored = localStorageService.getPromotions();
+    setPromotions(stored);
   }, []);
 
   const addPromotion = (promotion: Omit<Promotion, 'id'>) => {
-    const newPromotion = {
+    const newPromotion: Promotion = {
       ...promotion,
-      id: Date.now().toString()
+      id: Date.now().toString(),
+      isActive: true,
+      selectedProducts: promotion.selectedProducts || []
     };
     const updated = [...promotions, newPromotion];
     setPromotions(updated);
-    localStorage.setItem('petstore:promotions', JSON.stringify(updated));
+    localStorageService.savePromotions(updated);
+  };
+
+  const updatePromotion = (id: string, promotion: Partial<Promotion>) => {
+    const updated = promotions.map(p => 
+      p.id === id ? { ...p, ...promotion } : p
+    );
+    setPromotions(updated);
+    localStorageService.savePromotions(updated);
   };
 
   const deletePromotion = (id: string) => {
-    const updated = promotions.filter(p => p.id !== id);
+    const updated = promotions.map(p => 
+      p.id === id ? { ...p, isActive: false } : p
+    );
     setPromotions(updated);
-    localStorage.setItem('petstore:promotions', JSON.stringify(updated));
+    localStorageService.savePromotions(updated);
   };
 
-  return { promotions, addPromotion, deletePromotion };
+  const permanentlyDeletePromotion = (id: string) => {
+    const updated = promotions.filter(p => p.id !== id);
+    setPromotions(updated);
+    localStorageService.savePromotions(updated);
+  };
+
+  const restorePromotion = (id: string) => {
+    const updated = promotions.map(p => 
+      p.id === id ? { ...p, isActive: true } : p
+    );
+    setPromotions(updated);
+    localStorageService.savePromotions(updated);
+  };
+
+  return { 
+    promotions, 
+    addPromotion, 
+    updatePromotion,
+    deletePromotion,
+    permanentlyDeletePromotion,
+    restorePromotion
+  };
 };

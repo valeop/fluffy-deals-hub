@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import pawLogo from '@/assets/paw-logo.png';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
+import { SettingsPanel } from '@/components/SettingsPanel';
 
 export const Navbar = () => {
   const location = useLocation();
@@ -41,8 +42,10 @@ export const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-4">
+        <SettingsPanel />
+        
         <Link to="/admin/promotions">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="text-primary hover:bg-accent">
             <ShoppingCart size={20} />
           </Button>
         </Link>
@@ -50,13 +53,13 @@ export const Navbar = () => {
         {user ? (
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">{user.email}</span>
-            <Button variant="ghost" size="sm" onClick={logout}>
+            <Button variant="ghost" size="sm" onClick={logout} className="text-primary hover:bg-accent">
               Salir
             </Button>
           </div>
         ) : (
           <Link to="/login">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-primary hover:bg-accent">
               <User size={20} />
             </Button>
           </Link>

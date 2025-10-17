@@ -12,6 +12,8 @@ export interface Promotion {
   startDate: string;
   endDate: string;
   image: string;
+  isActive: boolean;
+  selectedProducts: string[];
 }
 
 export interface AuthUser {

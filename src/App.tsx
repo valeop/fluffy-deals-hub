@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import PromotionsList from "./pages/admin/PromotionsList";
 import CreatePromotion from "./pages/admin/CreatePromotion";
+import EditPromotion from "./pages/admin/EditPromotion";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/admin/promotions" element={<PromotionsList />} />
           <Route path="/admin/promotions/create" element={<CreatePromotion />} />
+          <Route path="/admin/promotions/:id/edit" element={<EditPromotion />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

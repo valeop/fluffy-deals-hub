@@ -1,31 +1,28 @@
 import { useState, useEffect } from 'react';
 import { AuthUser } from '@/types';
+import { localStorageService } from '@/services/localStorage.service';
 
 export const useAuth = () => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const session = localStorage.getItem('petstore:session');
+    localStorageService.initializeDefaults();
+    const session = localStorageService.getSession();
     if (session) {
-      try {
-        const userData = JSON.parse(session);
-        setUser(userData);
-      } catch (error) {
-        localStorage.removeItem('petstore:session');
-      }
+      setUser(session);
     }
     setLoading(false);
   }, []);
 
   const login = (email: string, password: string): boolean => {
-    const users = JSON.parse(localStorage.getItem('petstore:users') || '[]');
-    const foundUser = users.find((u: any) => u.email === email && u.password === password);
+    const users = localStorageService.getUsers();
+    const foundUser = users.find((u) => u.email === email && u.password === password);
     
     if (foundUser) {
       const authUser: AuthUser = { email, isAuthenticated: true };
       setUser(authUser);
-      localStorage.setItem('petstore:session', JSON.stringify(authUser));
+      localStorageService.saveSession(authUser);
       return true;
     }
     return false;
@@ -33,13 +30,20 @@ export const useAuth = () => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('petstore:session');
+    localStorageService.clearSession();
   };
 
-  const register = (email: string, password: string) => {
-    const users = JSON.parse(localStorage.getItem('petstore:users') || '[]');
+  const register = (email: string, password: string): boolean => {
+    const users = localStorageService.getUsers();
+    
+    // Check if user already exists
+    if (users.find((u) => u.email === email)) {
+      return false;
+    }
+    
     users.push({ email, password });
-    localStorage.setItem('petstore:users', JSON.stringify(users));
+    localStorageService.saveUsers(users);
+    return true;
   };
 
   return { user, loading, login, logout, register };
