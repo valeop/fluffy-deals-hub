@@ -85,6 +85,10 @@ const EditPromotion = () => {
   });
 
   useEffect(() => {
+    console.log('Promotions:', promotions);
+    console.log('Looking for ID:', id);
+    console.log('Found promotion:', promotion);
+    
     if (promotion) {
       setValue('name', promotion.name);
       setValue('description', promotion.description);
@@ -376,8 +380,20 @@ const EditPromotion = () => {
     );
   };
 
-  if (!promotion) {
+  if (!promotion && promotions.length > 0) {
     return null;
+  }
+
+  if (promotions.length === 0) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-6 py-8">
+          <Card className="max-w-2xl mx-auto p-12 text-center">
+            <p className="text-muted-foreground">Cargando...</p>
+          </Card>
+        </div>
+      </Layout>
+    );
   }
 
   return (
