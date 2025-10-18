@@ -63,7 +63,7 @@ const productsByCategory: Record<string, Array<{id: string, name: string, price:
 const EditPromotion = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { promotions, updatePromotion } = usePromotions();
+  const { promotions, isLoading, updatePromotion } = usePromotions();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -88,6 +88,9 @@ const EditPromotion = () => {
     console.log('Promotions:', promotions);
     console.log('Looking for ID:', id);
     console.log('Found promotion:', promotion);
+    console.log('Is Loading:', isLoading);
+    
+    if (isLoading) return;
     
     if (promotion) {
       setValue('name', promotion.name);
@@ -105,7 +108,7 @@ const EditPromotion = () => {
       });
       navigate('/admin/promotions');
     }
-  }, [promotion, id, navigate, setValue, toast]);
+  }, [promotion, id, navigate, setValue, toast, isLoading]);
 
   const handleNextStep = async () => {
     const isValid = await trigger(['name', 'description', 'category', 'discount', 'startDate', 'endDate']);
@@ -380,11 +383,7 @@ const EditPromotion = () => {
     );
   };
 
-  if (!promotion && promotions.length > 0) {
-    return null;
-  }
-
-  if (promotions.length === 0) {
+  if (isLoading) {
     return (
       <Layout>
         <div className="container mx-auto px-6 py-8">
@@ -394,6 +393,10 @@ const EditPromotion = () => {
         </div>
       </Layout>
     );
+  }
+
+  if (!promotion) {
+    return null;
   }
 
   return (

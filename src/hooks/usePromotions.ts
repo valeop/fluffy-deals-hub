@@ -4,11 +4,13 @@ import { localStorageService } from '@/services/localStorage.service';
 
 export const usePromotions = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     localStorageService.initializeDefaults();
     const stored = localStorageService.getPromotions();
     setPromotions(stored);
+    setIsLoading(false);
   }, []);
 
   const addPromotion = (promotion: Omit<Promotion, 'id'>) => {
@@ -55,6 +57,7 @@ export const usePromotions = () => {
 
   return { 
     promotions, 
+    isLoading,
     addPromotion, 
     updatePromotion,
     deletePromotion,
