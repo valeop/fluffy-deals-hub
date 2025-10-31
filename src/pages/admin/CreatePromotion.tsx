@@ -25,7 +25,8 @@ const promotionSchema = z.object({
 }).refine((data) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const startDate = new Date(data.startDate);
+  const startDate = new Date(data.startDate + 'T00:00:00');
+  startDate.setHours(0, 0, 0, 0);
   return startDate >= today;
 }, {
   message: 'La fecha de inicio no puede ser anterior a hoy',
